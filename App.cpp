@@ -24,7 +24,7 @@ AppStage App::SelectGame()
 
 void App::StartApp()
 {
-	AppStage currentStage = AppStage::MENU;
+	AppStage currentStage = AppStage::CHESS;
 	while (true) {
 		switch (currentStage)
 		{

@@ -1,8 +1,15 @@
 #include <iostream>
 #include "Chess.h"
+#include <set>
 
 Chess::Chess()
 {
+	White_figures.insert(Figure::White_King);
+	White_figures.insert(Figure::White_Knight);
+	White_figures.insert(Figure::White_Officer);
+	White_figures.insert(Figure::White_Pawn);
+	White_figures.insert(Figure::White_Queen);
+	White_figures.insert(Figure::White_Rook);
 }
 
 Chess::~Chess()
@@ -22,12 +29,14 @@ void Chess::StartChess()
 		{
 			WhiteMotion();
 			PrintField();
+			Motion = 1;
 			continue;
 		}
 		case 2:
 		{
 			BlackMotion();
 			PrintField();
+			Motion = 1;
 			continue;
 		}
 		default:
@@ -141,32 +150,168 @@ void Chess::CreateField()
 	Field[7][4] = Figure::White_King;
 }
 
+int Chess::DefineColor(Figure figure)
+{
+	int color = 2;
+	for (auto x : White_figures) if (x == figure) color = 1;
+	return color;
+}
+
+std::set<std::pair<int, int>> Chess::GetPossibleMoves(int x, int y)
+{
+	std::set<std::pair<int, int>> moves;
+	Figure figure = Field[y][x];
+	
+	int color = DefineColor(figure);
+
+	if (figure == Figure::White_Pawn) {
+
+	}
+	else if (figure == Figure::White_Rook || figure == Figure::Black_Rook) {
+		for (int i = x; i < 8; ++i) {
+			if (i == x) continue;
+			if (color == DefineColor(Field[y][i])) continue;
+			moves.insert(std::make_pair(i, y));
+			if (Field[y][i] != Figure::Empty && i != x) break;
+		}
+		for (int i = x; i >= 0; --i) {
+			if (i == x) continue;
+			if (color == DefineColor(Field[y][i])) continue;
+			moves.insert(std::make_pair(i, y));
+			if (Field[y][i] != Figure::Empty && i != x) break;
+		}
+		for (int i = y; i < 8; ++i) {
+			if (i == y) continue;
+			if (color == DefineColor(Field[i][x])) continue;
+			moves.insert(std::make_pair(x, i));
+			if (Field[i][x] != Figure::Empty && i != y) break;
+		}
+		for (int i = y; i >= 0; --i) {
+			if (i == y) continue;
+			if (color == DefineColor(Field[i][x])) continue;
+			moves.insert(std::make_pair(x, i));
+			if (Field[i][x] != Figure::Empty && i != y) break;
+		}
+	}
+	
+	return moves;
+}
+
+bool Chess::CheckForCheck(std::vector<std::vector<Figure>> field)
+{
+
+	return false;
+}
+
+bool Chess::CheckSelectField(int s1, int s2, int e1, int e2)
+{
+	//if (Field[s2][s1] == Figure::White_Pawn || Field[s2][s1] == Figure::Black_Pawn) return true;
+	std::set<std::pair<int, int>> movies = GetPossibleMoves(s1, s2);
+	/*for (auto x : movies)
+	{
+		std::cout << x.first << ' ' << x.second << '\n';
+		if (x.first == e1 && x.second == e2) return true;
+	}*/
+	return false;
+}
+
+bool Chess::CheckSelectFigure(int s1, int s2, int color)
+{
+	if (Field[s2][s1] == Figure::Empty) return false;
+	if (color == 1)
+	{
+		if (Field[s2][s1] == Figure::Black_King || Field[s2][s1] == Figure::Black_Knight ||
+			Field[s2][s1] == Figure::Black_Officer || Field[s2][s1] == Figure::Black_Pawn ||
+			Field[s2][s1] == Figure::Black_Queen || Field[s2][s1] == Figure::Black_Rook)
+			return false;
+	}
+	else if (color == 2)
+	{
+		if (Field[s2][s1] == Figure::White_King || Field[s2][s1] == Figure::White_Knight ||
+			Field[s2][s1] == Figure::White_Officer || Field[s2][s1] == Figure::White_Pawn ||
+			Field[s2][s1] == Figure::White_Queen || Field[s2][s1] == Figure::White_Rook)
+			return false;
+	}
+
+	return true;
+}
+
 void Chess::UpdateField(int s1, int s2, int e1, int e2)
 {
-	Field[e1][e2] = Field[s1][s2];
-	Field[s1][s2] = Figure::Empty;
+	Field[e2][e1] = Field[s2][s1];
+	Field[s2][s1] = Figure::Empty;
 }
 
 void Chess::WhiteMotion()
 {
 	std::string start, end;
-	std::cin >> start >> end;
-	int s1 = start[0] - 97, s2 = start[1] - 49;
-	int e1 = end[0] - 97, e2 = end[1] - 49;
-	s1 = abs(s1 - 7); s2 = abs(s2 - 7);
-	e1 = abs(e1 - 7); e2 = abs(e2 - 7);
-	std::cout << s1 << ' ' << s2 << '\n';
-	std::cout << e1 << ' ' << e2 << '\n' << '\n';
-	UpdateField(s1, s2, e1, e2);
+	while (true) {
+		std::cout << "<-- White motion -->\n";
+		int s1, s2;
+		while (true)
+		{
+			std::cout << "Select figure: ";
+			std::cin >> start;
+			s1 = start[0] - 97, s2 = start[1] - 49;
+			s2 = abs(s2 - 7);
+			if (CheckSelectFigure(s1, s2, 1)) break;
+			else
+			{
+				std::cout << "Uncorrect chose! Try again!\n";
+				continue;
+			}
+		}
+		int e1, e2;
+		while (true)
+		{
+			std::cout << "Select field: ";
+			std::cin >> end;
+			e1 = e1 = end[0] - 97, e2 = end[1] - 49;
+			e2 = abs(e2 - 7);
+			if (CheckSelectField(s1, s2, e1, e2)) break;
+			else
+			{
+				std::cout << "Uncorrect field! Try again!\n";
+				continue;
+			}
+		}
+		UpdateField(s1, s2, e1, e2);
+		return;
+	}
 }
 
 void Chess::BlackMotion()
 {
 	std::string start, end;
-	std::cin >> start >> end;
-	int s1 = start[0] - 97, s2 = start[1] - 49;
-	int e1 = end[0] - 97, e2 = end[1] - 49;
-	std::cout << s1 << ' ' << s2 << '\n';
-	std::cout << e1 << ' ' << e2 << '\n' << '\n';
-	UpdateField(s1, s2, e1, e2);
+	while (true) {
+		std::cout << "<-- Black motion -->\n";
+		int s1, s2;
+		while (true)
+		{
+			std::cout << "Select figure: ";
+			std::cin >> start;
+			s1 = start[0] - 97, s2 = start[1] - 49;
+			if (CheckSelectFigure(s1, s2, 2)) break;
+			else
+			{
+				std::cout << "Uncorrect chose! Try again!\n";
+				continue;
+			}
+		}
+		int e1, e2;
+		while (true)
+		{
+			std::cout << "Select field: ";
+			std::cin >> end;
+			e1 = e1 = end[0] - 97, e2 = end[1] - 49;
+			if (CheckSelectField(s1, s2, e1, e2)) break;
+			else
+			{
+				std::cout << "Uncorrect field! Try again!\n";
+				continue;
+			}
+		}
+		UpdateField(s1, s2, e1, e2);
+		return;
+	}
 }
