@@ -10,6 +10,13 @@ Chess::Chess()
 	White_figures.insert(Figure::White_Pawn);
 	White_figures.insert(Figure::White_Queen);
 	White_figures.insert(Figure::White_Rook);
+
+	Black_figures.insert(Figure::Black_King);
+	Black_figures.insert(Figure::Black_Knight);
+	Black_figures.insert(Figure::Black_Officer);
+	Black_figures.insert(Figure::Black_Pawn);
+	Black_figures.insert(Figure::Black_Queen);
+	Black_figures.insert(Figure::Black_Rook);
 }
 
 Chess::~Chess()
@@ -29,7 +36,7 @@ void Chess::StartChess()
 		{
 			WhiteMotion();
 			PrintField();
-			Motion = 1;
+			Motion = 2;
 			continue;
 		}
 		case 2:
@@ -152,8 +159,10 @@ void Chess::CreateField()
 
 int Chess::DefineColor(Figure figure)
 {
-	int color = 2;
+	//0 == Empty, 1 == White, 2 == Black
+	int color = 0;
 	for (auto x : White_figures) if (x == figure) color = 1;
+	for (auto x : Black_figures) if (x == figure) color = 2;
 	return color;
 }
 
@@ -164,8 +173,31 @@ std::set<std::pair<int, int>> Chess::GetPossibleMoves(int x, int y)
 	
 	int color = DefineColor(figure);
 
-	if (figure == Figure::White_Pawn) {
-
+	if (figure == Figure::White_Officer || figure == Figure::Black_Officer) {
+		for (int i = x, j = y; i < 8 && j < 8; ++i, ++j) {
+			if (i == x && j == y) continue;
+			if (color == DefineColor(Field[j][i])) break;
+			moves.insert(std::make_pair(i, j));
+			if (Field[j][i] != Figure::Empty) break;
+		}
+		for (int i = x, j = y; i >= 0 && j >= 0; --i, --j) {
+			if (i == x && j == y) continue;
+			if (color == DefineColor(Field[j][i])) break;
+			moves.insert(std::make_pair(i, j));
+			if (Field[j][i] != Figure::Empty) break;
+		}
+		for (int i = x, j = y; i < 8 && j >= 0; ++i, --j) {
+			if (i == x && j == y) continue;
+			if (color == DefineColor(Field[j][i])) break;
+			moves.insert(std::make_pair(i, j));
+			if (Field[j][i] != Figure::Empty) break;
+		}
+		for (int i = x, j = y; i >= 0 && j < 8; --i, ++j) {
+			if (i == x && j == y) continue;
+			if (color == DefineColor(Field[j][i])) break;
+			moves.insert(std::make_pair(i, j));
+			if (Field[j][i] != Figure::Empty) break;
+		}
 	}
 	else if (figure == Figure::White_Rook || figure == Figure::Black_Rook) {
 		for (int i = x; i < 8; ++i) {
@@ -193,6 +225,120 @@ std::set<std::pair<int, int>> Chess::GetPossibleMoves(int x, int y)
 			if (Field[i][x] != Figure::Empty && i != y) break;
 		}
 	}
+	else if (figure == Figure::White_Queen || figure == Figure::Black_Queen) {
+		for (int i = x, j = y; i < 8 && j < 8; ++i, ++j) {
+			if (i == x && j == y) continue;
+			if (color == DefineColor(Field[j][i])) break;
+			moves.insert(std::make_pair(i, j));
+			if (Field[j][i] != Figure::Empty) break;
+		}
+		for (int i = x, j = y; i >= 0 && j >= 0; --i, --j) {
+			if (i == x && j == y) continue;
+			if (color == DefineColor(Field[j][i])) break;
+			moves.insert(std::make_pair(i, j));
+			if (Field[j][i] != Figure::Empty) break;
+		}
+		for (int i = x, j = y; i < 8 && j >= 0; ++i, --j) {
+			if (i == x && j == y) continue;
+			if (color == DefineColor(Field[j][i])) break;
+			moves.insert(std::make_pair(i, j));
+			if (Field[j][i] != Figure::Empty) break;
+		}
+		for (int i = x, j = y; i >= 0 && j < 8; --i, ++j) {
+			if (i == x && j == y) continue;
+			if (color == DefineColor(Field[j][i])) break;
+			moves.insert(std::make_pair(i, j));
+			if (Field[j][i] != Figure::Empty) break;
+		}
+		for (int i = x; i < 8; ++i) {
+			if (i == x) continue;
+			if (color == DefineColor(Field[y][i])) continue;
+			moves.insert(std::make_pair(i, y));
+			if (Field[y][i] != Figure::Empty && i != x) break;
+		}
+		for (int i = x; i >= 0; --i) {
+			if (i == x) continue;
+			if (color == DefineColor(Field[y][i])) continue;
+			moves.insert(std::make_pair(i, y));
+			if (Field[y][i] != Figure::Empty && i != x) break;
+		}
+		for (int i = y; i < 8; ++i) {
+			if (i == y) continue;
+			if (color == DefineColor(Field[i][x])) continue;
+			moves.insert(std::make_pair(x, i));
+			if (Field[i][x] != Figure::Empty && i != y) break;
+		}
+		for (int i = y; i >= 0; --i) {
+			if (i == y) continue;
+			if (color == DefineColor(Field[i][x])) continue;
+			moves.insert(std::make_pair(x, i));
+			if (Field[i][x] != Figure::Empty && i != y) break;
+		}
+	}
+	else if (figure == Figure::White_King || figure == Figure::Black_King) {
+		if ((x + 1 <= 7) && (color != DefineColor(Field[y][x + 1]))) {
+			moves.insert(std::make_pair(x + 1, y));
+		}
+		if ((x - 1 >= 0) && (color != DefineColor(Field[y][x - 1]))) {
+			moves.insert(std::make_pair(x - 1, y));
+		}
+		if ((y + 1 <= 7) && (color != DefineColor(Field[y + 1][x]))) {
+			moves.insert(std::make_pair(x, y + 1));
+		}
+		if ((y - 1 >= 0) && (color != DefineColor(Field[y - 1][x]))) {
+			moves.insert(std::make_pair(x, y - 1));
+		}
+
+		if ((x + 1 <= 7) && (y + 1 <= 7) && (color != DefineColor(Field[y + 1][x + 1]))) {
+			moves.insert(std::make_pair(x + 1, y + 1));
+		}
+		if ((x - 1 >= 0) && (y - 1 >= 0) && (color != DefineColor(Field[y - 1][x - 1]))) {
+			moves.insert(std::make_pair(x - 1, y - 1));
+		}
+		if ((y + 1 <= 7) && (x - 1 >= 0) && (color != DefineColor(Field[y + 1][x - 1]))) {
+			moves.insert(std::make_pair(x - 1, y + 1));
+		}
+		if ((y - 1 >= 0) && (x + 1 <= 7) && (color != DefineColor(Field[y - 1][x + 1]))) {
+			moves.insert(std::make_pair(x + 1, y - 1));
+		}
+	}
+	else if (figure == Figure::White_Knight || figure == Figure::Black_Knight) {
+		if ((x + 1 <= 7) && (y + 2 <= 7) && (color != DefineColor(Field[y + 2][x + 1]))) {
+			moves.insert(std::make_pair(x + 1, y + 2));
+		}
+		if ((x + 1 <= 7) && (y - 2 >= 0) && (color != DefineColor(Field[y - 2][x + 1]))) {
+			moves.insert(std::make_pair(x + 1, y - 2));
+		}
+		if ((x - 1 >= 0) && (y + 2 <= 7) && (color != DefineColor(Field[y + 2][x - 1]))) {
+			moves.insert(std::make_pair(x - 1, y + 2));
+		}
+		if ((x - 1 >= 0) && (y - 2 >= 0) && (color != DefineColor(Field[y - 2][x - 1]))) {
+			moves.insert(std::make_pair(x - 1, y - 2));
+		}
+
+		if ((x + 2 <= 7) && (y + 1 <= 7) && (color != DefineColor(Field[y + 1][x + 2]))) {
+			moves.insert(std::make_pair(x + 2, y + 1));
+		}
+		if ((x + 2 <= 7) && (y - 1 >= 0) && (color != DefineColor(Field[y - 1][x + 2]))) {
+			moves.insert(std::make_pair(x + 2, y - 1));
+		}
+		if ((x - 2 >= 0) && (y + 1 <= 7) && (color != DefineColor(Field[y + 1][x - 2]))) {
+			moves.insert(std::make_pair(x - 2, y + 1));
+		}
+		if ((x - 2 >= 0) && (y - 1 >= 0) && (color != DefineColor(Field[y - 1][x - 2]))) {
+			moves.insert(std::make_pair(x - 2, y - 1));
+		}
+	}
+	else if (figure == Figure::White_Pawn) {
+		if ((y - 1 > 0) && Field[y - 1][x] == Figure::Empty) moves.insert(std::make_pair(x, y - 1));
+		if ((y - 1 > 0) && (x + 1 <= 7) && (color != DefineColor(Field[y - 1][x + 1]))) moves.insert(std::make_pair(x + 1, y - 1));
+		if ((y - 1 > 0) && (x - 1 >= 0) && (color != DefineColor(Field[y - 1][x - 1]))) moves.insert(std::make_pair(x - 1, y - 1));
+	}
+	else if (figure == Figure::Black_Pawn) {
+		if ((y + 1 < 7) && Field[y + 1][x] == Figure::Empty) moves.insert(std::make_pair(x, y + 1));
+		if ((y + 1 < 7) && (x + 1 <= 7) && (color != DefineColor(Field[y + 1][x + 1]))) moves.insert(std::make_pair(x + 1, y + 1));
+		if ((y + 1 < 7) && (x - 1 >= 0) && (color != DefineColor(Field[y + 1][x - 1]))) moves.insert(std::make_pair(x - 1, y + 1));
+	}
 	
 	return moves;
 }
@@ -205,13 +351,12 @@ bool Chess::CheckForCheck(std::vector<std::vector<Figure>> field)
 
 bool Chess::CheckSelectField(int s1, int s2, int e1, int e2)
 {
-	//if (Field[s2][s1] == Figure::White_Pawn || Field[s2][s1] == Figure::Black_Pawn) return true;
 	std::set<std::pair<int, int>> movies = GetPossibleMoves(s1, s2);
-	/*for (auto x : movies)
+	for (auto x : movies)
 	{
 		std::cout << x.first << ' ' << x.second << '\n';
 		if (x.first == e1 && x.second == e2) return true;
-	}*/
+	}
 	return false;
 }
 
@@ -291,6 +436,7 @@ void Chess::BlackMotion()
 			std::cout << "Select figure: ";
 			std::cin >> start;
 			s1 = start[0] - 97, s2 = start[1] - 49;
+			s2 = abs(s2 - 7);
 			if (CheckSelectFigure(s1, s2, 2)) break;
 			else
 			{
@@ -304,6 +450,7 @@ void Chess::BlackMotion()
 			std::cout << "Select field: ";
 			std::cin >> end;
 			e1 = e1 = end[0] - 97, e2 = end[1] - 49;
+			e2 = abs(e2 - 7);
 			if (CheckSelectField(s1, s2, e1, e2)) break;
 			else
 			{

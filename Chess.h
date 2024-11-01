@@ -26,6 +26,7 @@ private:
 	//The chessboard
 	std::vector<std::vector<Figure>> Field;
 	std::set<Figure> White_figures;
+	std::set<Figure> Black_figures;
 public:
 	//Constructors and distructors
 	Chess();
