@@ -23,9 +23,10 @@ Chess::~Chess()
 {
 }
 
-void Chess::StartChess()
+void Chess::StartChess(sf::RenderWindow& window)
 {
 	this->CreateField();
+	DrawChessboard(window);
 	this->PrintField();
 	inPlay = true;
 	while (inPlay) 
@@ -34,15 +35,32 @@ void Chess::StartChess()
 		{
 		case 1:
 		{
+			//Close controller - bad realization
+			sf::Event event;
+			while (window.pollEvent(event))
+			{
+				if (event.type == sf::Event::Closed)
+					window.close();
+			}
+
 			WhiteMotion();
 			PrintField();
+			DrawChessboard(window);
 			Motion = 2;
 			continue;
 		}
 		case 2:
 		{
+			//Close controller - bad realization
+			sf::Event event;
+			while (window.pollEvent(event))
+			{
+				if (event.type == sf::Event::Closed)
+					window.close();
+			}
 			BlackMotion();
 			PrintField();
+			DrawChessboard(window);
 			Motion = 1;
 			continue;
 		}
@@ -126,6 +144,17 @@ void Chess::PrintField()
 		std::cout << '\n';
 	}
 	std::cout << "\n\n\ta\tb\tc\td\te\tf\tg\th\t\n\n";
+}
+
+void Chess::DrawChessboard(sf::RenderWindow& window)
+{
+	sf::CircleShape shape(100.f, 3);
+	shape.setPosition(100, 100);
+	shape.setFillColor(sf::Color::Magenta);
+
+	window.clear(sf::Color::Black);
+	window.draw(shape);
+	window.display();
 }
 
 void Chess::CreateField()

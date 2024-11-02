@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include "AppStage.h"
+#include <SFML/Graphics.hpp>
 
 class App {
 private:

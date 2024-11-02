@@ -6,6 +6,7 @@
 
 
 
+
 AppStage App::SelectGame()
 {
 	std::cout << "Input name of game!\n";
@@ -25,7 +26,14 @@ AppStage App::SelectGame()
 void App::StartApp()
 {
 	AppStage currentStage = AppStage::CHESS;
-	while (true) {
+
+	sf::RenderWindow window(sf::VideoMode(1600, 1200), L"Games!", sf::Style::Default);
+
+	window.setVerticalSyncEnabled(true);
+
+	
+
+	while (window.isOpen()) {
 		switch (currentStage)
 		{
 		case AppStage::MENU:
@@ -39,7 +47,7 @@ void App::StartApp()
 		case AppStage::CHESS:
 		{
 			Chess game;
-			game.StartChess();
+			game.StartChess(window);
 			currentStage = AppStage::MENU;
 			break;
 		}
