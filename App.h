@@ -11,4 +11,5 @@ public:
 	AppStage SelectGame();
 	void StartApp();
 	
+	void SFML_DrawMenu(sf::RenderWindow& window);
 };

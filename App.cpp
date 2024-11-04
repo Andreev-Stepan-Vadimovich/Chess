@@ -4,9 +4,6 @@
 #include "AppStage.h"
 #include "Chess.h"
 
-
-
-
 AppStage App::SelectGame()
 {
 	std::cout << "Input name of game!\n";
@@ -25,7 +22,7 @@ AppStage App::SelectGame()
 
 void App::StartApp()
 {
-	AppStage currentStage = AppStage::CHESS;
+	AppStage currentStage = AppStage::MENU;
 
 	sf::RenderWindow window(sf::VideoMode(1600, 1200), L"Games!", sf::Style::Default);
 
@@ -38,6 +35,7 @@ void App::StartApp()
 		{
 		case AppStage::MENU:
 		{
+			SFML_DrawMenu(window);
 			std::cout << "<----- LIST OF GAMES ----->\n";
 			for (int i = 0; i < Games.size(); ++i) std::cout << Games[i] << '\n';
 			std::cout << "<------------------------->\n\n";
@@ -55,4 +53,23 @@ void App::StartApp()
 			return;
 		}
 	}
+}
+
+void App::SFML_DrawMenu(sf::RenderWindow& window)
+{
+	sf::CircleShape shape(100.f, 3);
+	shape.setPosition(100, 100);
+	shape.setFillColor(sf::Color::Red);
+
+	sf::Texture BackGroundTexture;
+	BackGroundTexture.loadFromFile("Photo/Menu/Menu-Background.jpg");
+	//BackGroundTexture.loadFromFile("Photo/Chess/ChessBoardBlack.jpg");
+	sf::Sprite BackGroundSprite;
+	BackGroundSprite.setTexture(BackGroundTexture);
+
+	window.clear(sf::Color::Black);
+	/*window.draw(shape);*/
+	window.draw(BackGroundSprite);
+	//window.draw(shape);
+	window.display();
 }
