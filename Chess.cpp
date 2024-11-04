@@ -1,6 +1,8 @@
 #include <iostream>
 #include "Chess.h"
 #include <set>
+#include "App.h"
+#include "SFML_ChessRender.h"
 
 Chess::Chess()
 {
@@ -26,7 +28,7 @@ Chess::~Chess()
 void Chess::StartChess(sf::RenderWindow& window)
 {
 	this->CreateField();
-	SFML_DrawChessboard(window);
+	SFML_ChessRender::SFML_DrawChessboard(window);
 	this->PrintField();
 	inPlay = true;
 	while (inPlay) 
@@ -45,7 +47,7 @@ void Chess::StartChess(sf::RenderWindow& window)
 
 			WhiteMotion();
 			PrintField();
-			SFML_DrawChessboard(window);
+			SFML_ChessRender::SFML_DrawChessboard(window);
 			Motion = 2;
 			continue;
 		}
@@ -60,7 +62,7 @@ void Chess::StartChess(sf::RenderWindow& window)
 			}
 			BlackMotion();
 			PrintField();
-			SFML_DrawChessboard(window);
+			SFML_ChessRender::SFML_DrawChessboard(window);
 			Motion = 1;
 			continue;
 		}
@@ -144,19 +146,6 @@ void Chess::PrintField()
 		std::cout << '\n';
 	}
 	std::cout << "\n\n\ta\tb\tc\td\te\tf\tg\th\t\n\n";
-}
-
-void Chess::SFML_DrawChessboard(sf::RenderWindow& window)
-{
-	sf::Texture BackGroundTexture;
-	//BackGroundTexture.loadFromFile("Photo/Menu/Menu-Background.jpg");
-	BackGroundTexture.loadFromFile("Photo/Chess/ChessBoardBlack.jpg");
-	sf::Sprite BackGroundSprite;
-	BackGroundSprite.setTexture(BackGroundTexture);
-
-	window.clear(sf::Color::Black);
-	window.draw(BackGroundSprite);
-	window.display();
 }
 
 void Chess::CreateField()

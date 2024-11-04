@@ -38,9 +38,6 @@ public:
 
 	//A function for displaying a chessboard in the console
 	void PrintField();
-
-	//A function for drawing chessboadrd
-	void SFML_DrawChessboard(sf::RenderWindow& window);
 private:
 	//A function for initialization of a chessboard
 	void CreateField();

@@ -24,11 +24,9 @@ void App::StartApp()
 {
 	AppStage currentStage = AppStage::MENU;
 
-	sf::RenderWindow window(sf::VideoMode(1600, 1200), L"Games!", sf::Style::Default);
+	sf::RenderWindow window(sf::VideoMode(WindowWidth, WindowHeight), L"Games!", sf::Style::Default);
 
 	window.setVerticalSyncEnabled(true);
-
-	
 
 	while (window.isOpen()) {
 		switch (currentStage)
@@ -53,6 +51,16 @@ void App::StartApp()
 			return;
 		}
 	}
+}
+
+int App::Get_WindowHeight()
+{
+	return WindowHeight;
+}
+
+int App::Get_WindowWidth()
+{
+	return WindowWidth;
 }
 
 void App::SFML_DrawMenu(sf::RenderWindow& window)
