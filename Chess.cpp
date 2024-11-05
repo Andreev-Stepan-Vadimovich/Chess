@@ -28,7 +28,7 @@ Chess::~Chess()
 void Chess::StartChess(sf::RenderWindow& window)
 {
 	this->CreateField();
-	SFML_ChessRender::SFML_DrawChessboard(window);
+	SFML_ChessRender::SFML_DrawChessboard(window, Field);
 	this->PrintField();
 	inPlay = true;
 	while (inPlay) 
@@ -47,7 +47,7 @@ void Chess::StartChess(sf::RenderWindow& window)
 
 			WhiteMotion();
 			PrintField();
-			SFML_ChessRender::SFML_DrawChessboard(window);
+			SFML_ChessRender::SFML_DrawChessboard(window, Field);
 			Motion = 2;
 			continue;
 		}
@@ -62,7 +62,7 @@ void Chess::StartChess(sf::RenderWindow& window)
 			}
 			BlackMotion();
 			PrintField();
-			SFML_ChessRender::SFML_DrawChessboard(window);
+			SFML_ChessRender::SFML_DrawChessboard(window, Field);
 			Motion = 1;
 			continue;
 		}

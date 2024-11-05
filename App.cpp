@@ -22,7 +22,7 @@ AppStage App::SelectGame()
 
 void App::StartApp()
 {
-	AppStage currentStage = AppStage::MENU;
+	AppStage currentStage = AppStage::CHESS;
 
 	sf::RenderWindow window(sf::VideoMode(WindowWidth, WindowHeight), L"Games!", sf::Style::Default);
 
@@ -65,10 +65,6 @@ int App::Get_WindowWidth()
 
 void App::SFML_DrawMenu(sf::RenderWindow& window)
 {
-	sf::CircleShape shape(100.f, 3);
-	shape.setPosition(100, 100);
-	shape.setFillColor(sf::Color::Red);
-
 	sf::Texture BackGroundTexture;
 	BackGroundTexture.loadFromFile("Photo/Menu/Menu-Background.jpg");
 	//BackGroundTexture.loadFromFile("Photo/Chess/ChessBoardBlack.jpg");
@@ -76,8 +72,6 @@ void App::SFML_DrawMenu(sf::RenderWindow& window)
 	BackGroundSprite.setTexture(BackGroundTexture);
 
 	window.clear(sf::Color::Black);
-	/*window.draw(shape);*/
 	window.draw(BackGroundSprite);
-	//window.draw(shape);
 	window.display();
 }
