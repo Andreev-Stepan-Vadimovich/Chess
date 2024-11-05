@@ -4,8 +4,6 @@
 #include "AppStage.h"
 #include "Chess.h"
 
-
-
 AppStage App::SelectGame()
 {
 	std::cout << "Input name of game!\n";
@@ -25,11 +23,17 @@ AppStage App::SelectGame()
 void App::StartApp()
 {
 	AppStage currentStage = AppStage::CHESS;
-	while (true) {
+
+	sf::RenderWindow window(sf::VideoMode(WindowWidth, WindowHeight), L"Games!", sf::Style::Default);
+
+	window.setVerticalSyncEnabled(true);
+
+	while (window.isOpen()) {
 		switch (currentStage)
 		{
 		case AppStage::MENU:
 		{
+			SFML_DrawMenu(window);
 			std::cout << "<----- LIST OF GAMES ----->\n";
 			for (int i = 0; i < Games.size(); ++i) std::cout << Games[i] << '\n';
 			std::cout << "<------------------------->\n\n";
@@ -39,7 +43,7 @@ void App::StartApp()
 		case AppStage::CHESS:
 		{
 			Chess game;
-			game.StartChess();
+			game.StartChess(window);
 			currentStage = AppStage::MENU;
 			break;
 		}
@@ -47,4 +51,27 @@ void App::StartApp()
 			return;
 		}
 	}
+}
+
+int App::Get_WindowHeight()
+{
+	return WindowHeight;
+}
+
+int App::Get_WindowWidth()
+{
+	return WindowWidth;
+}
+
+void App::SFML_DrawMenu(sf::RenderWindow& window)
+{
+	sf::Texture BackGroundTexture;
+	BackGroundTexture.loadFromFile("Photo/Menu/Menu-Background.jpg");
+	//BackGroundTexture.loadFromFile("Photo/Chess/ChessBoardBlack.jpg");
+	sf::Sprite BackGroundSprite;
+	BackGroundSprite.setTexture(BackGroundTexture);
+
+	window.clear(sf::Color::Black);
+	window.draw(BackGroundSprite);
+	window.display();
 }

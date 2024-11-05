@@ -1,6 +1,8 @@
 #include <iostream>
 #include "Chess.h"
 #include <set>
+#include "App.h"
+#include "SFML_ChessRender.h"
 
 Chess::Chess()
 {
@@ -23,9 +25,10 @@ Chess::~Chess()
 {
 }
 
-void Chess::StartChess()
+void Chess::StartChess(sf::RenderWindow& window)
 {
 	this->CreateField();
+	SFML_ChessRender::SFML_DrawChessboard(window, Field);
 	this->PrintField();
 	inPlay = true;
 	while (inPlay) 
@@ -34,15 +37,32 @@ void Chess::StartChess()
 		{
 		case 1:
 		{
+			//Close controller - bad realization
+			sf::Event event;
+			while (window.pollEvent(event))
+			{
+				if (event.type == sf::Event::Closed)
+					window.close();
+			}
+
 			WhiteMotion();
 			PrintField();
+			SFML_ChessRender::SFML_DrawChessboard(window, Field);
 			Motion = 2;
 			continue;
 		}
 		case 2:
 		{
+			//Close controller - bad realization
+			sf::Event event;
+			while (window.pollEvent(event))
+			{
+				if (event.type == sf::Event::Closed)
+					window.close();
+			}
 			BlackMotion();
 			PrintField();
+			SFML_ChessRender::SFML_DrawChessboard(window, Field);
 			Motion = 1;
 			continue;
 		}

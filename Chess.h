@@ -2,6 +2,7 @@
 #include <vector>
 #include <map>
 #include <set>
+#include <SFML/Graphics.hpp>
 
 enum class Figure
 {
@@ -33,7 +34,7 @@ public:
 	~Chess();
 
 	//A function for starting and controlling the game
-	void StartChess();
+	void StartChess(sf::RenderWindow& window);
 
 	//A function for displaying a chessboard in the console
 	void PrintField();
