@@ -38,14 +38,14 @@ void Chess::StartChess(sf::RenderWindow& window)
 		case 1:
 		{
 			//Close controller - bad realization
-			sf::Event event;
+			/*sf::Event event;
 			while (window.pollEvent(event))
 			{
 				if (event.type == sf::Event::Closed)
 					window.close();
-			}
+			}*/
 
-			WhiteMotion();
+			WhiteMotion(window);
 			PrintField();
 			SFML_ChessRender::SFML_DrawChessboard(window, Field);
 			Motion = 2;
@@ -54,13 +54,13 @@ void Chess::StartChess(sf::RenderWindow& window)
 		case 2:
 		{
 			//Close controller - bad realization
-			sf::Event event;
+			/*sf::Event event;
 			while (window.pollEvent(event))
 			{
 				if (event.type == sf::Event::Closed)
 					window.close();
-			}
-			BlackMotion();
+			}*/
+			BlackMotion(window);
 			PrintField();
 			SFML_ChessRender::SFML_DrawChessboard(window, Field);
 			Motion = 1;
@@ -186,9 +186,9 @@ int Chess::DefineColor(Figure figure)
 	return color;
 }
 
-std::set<std::pair<int, int>> Chess::GetPossibleMoves(int x, int y)
+std::pair<std::set<std::pair<int, int>>, std::set<std::pair<int, int>>> Chess::GetPossibleMoves(int x, int y)
 {
-	std::set<std::pair<int, int>> moves;
+	std::set<std::pair<int, int>> moves, pawn_transform;
 	Figure figure = Field[y][x];
 	
 	int color = DefineColor(figure);
@@ -358,9 +358,15 @@ std::set<std::pair<int, int>> Chess::GetPossibleMoves(int x, int y)
 		if ((y + 1 < 7) && Field[y + 1][x] == Figure::Empty) moves.insert(std::make_pair(x, y + 1));
 		if ((y + 1 < 7) && (x + 1 <= 7) && (color != DefineColor(Field[y + 1][x + 1]))) moves.insert(std::make_pair(x + 1, y + 1));
 		if ((y + 1 < 7) && (x - 1 >= 0) && (color != DefineColor(Field[y + 1][x - 1]))) moves.insert(std::make_pair(x - 1, y + 1));
+		if (y + 1 == 7)
+		{
+			if (Field[y + 1][x] == Figure::Empty) pawn_transform.insert(std::make_pair(x, y + 1));
+			if ((x + 1 <= 7) && (color != DefineColor(Field[y + 1][x + 1]))) pawn_transform.insert(std::make_pair(x + 1, y + 1));
+			if ((x - 1 >= 0) && (color != DefineColor(Field[y + 1][x - 1]))) pawn_transform.insert(std::make_pair(x - 1, y + 1));
+		}
 	}
 	
-	return moves;
+	return std::pair<std::set<std::pair<int, int>>, std::set<std::pair<int, int>>>(moves, pawn_transform);
 }
 
 bool Chess::CheckForCheck(std::vector<std::vector<Figure>> field)
@@ -371,11 +377,20 @@ bool Chess::CheckForCheck(std::vector<std::vector<Figure>> field)
 
 bool Chess::CheckSelectField(int s1, int s2, int e1, int e2)
 {
-	std::set<std::pair<int, int>> movies = GetPossibleMoves(s1, s2);
-	for (auto x : movies)
+	//Movies.first - movies for all figures, Movies.second - transform for pawns
+	std::pair<std::set<std::pair<int, int>>, std::set<std::pair<int, int>>> movies = GetPossibleMoves(s1, s2);
+	for (auto x : movies.first)
 	{
 		std::cout << x.first << ' ' << x.second << '\n';
 		if (x.first == e1 && x.second == e2) return true;
+	}
+	if (Field[s2][s1] == Figure::White_Pawn || Field[s2][s1] == Figure::Black_Pawn)
+	{
+		for (auto x : movies.second)
+		{
+			std::cout << x.first << ' ' << x.second << '\n';
+			if (x.first == e1 && x.second == e2) return true;
+		}
 	}
 	return false;
 }
@@ -407,57 +422,80 @@ void Chess::UpdateField(int s1, int s2, int e1, int e2)
 	Field[s2][s1] = Figure::Empty;
 }
 
-void Chess::WhiteMotion()
+std::pair<int, int> Chess::SelectFigureByMouse(sf::RenderWindow& window)
 {
-	std::string start, end;
+	std::pair<int, int> StartCoordinates = SFML_ChessRender::SFML_GetStartCoordinates(App::Get_WindowHeight(), App::Get_WindowWidth());
+	StartCoordinates = { 400, 215 };
+	while (window.isOpen()) {
+		sf::Event event;
+		while (window.pollEvent(event)) {
+			if (event.type == sf::Event::Closed)
+				window.close();
+
+			if (event.type == sf::Event::MouseButtonPressed) {
+				sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+
+				if (event.mouseButton.button == sf::Mouse::Left) {
+					mousePos.x -= StartCoordinates.first;
+					mousePos.y -= StartCoordinates.second;
+					mousePos.x /= 100;
+					mousePos.y /= 100;
+					std::cout << mousePos.x << "   " << mousePos.y << '\n';
+					std::pair<int, int> ans = { mousePos.x, mousePos.y };
+					return ans;
+				}
+				/*else if (event.mouseButton.button == sf::Mouse::Right) {
+					std::cout << "Right mouse button pressed at ("
+						<< mousePos.x << ", "
+						<< mousePos.y << ")" << std::endl;
+				}*/
+			}
+		}
+	}
+}
+
+void Chess::WhiteMotion(sf::RenderWindow& window)
+{
+	std::pair<int, int> coordinatesStart, coordinatesEnd;
 	while (true) {
 		std::cout << "<-- White motion -->\n";
-		int s1, s2;
 		while (true)
 		{
 			std::cout << "Select figure: ";
-			std::cin >> start;
-			s1 = start[0] - 97, s2 = start[1] - 49;
-			s2 = abs(s2 - 7);
-			if (CheckSelectFigure(s1, s2, 1)) break;
+			coordinatesStart = SelectFigureByMouse(window);
+			if (CheckSelectFigure(coordinatesStart.first, coordinatesStart.second, 1)) break;
 			else
 			{
 				std::cout << "Uncorrect chose! Try again!\n";
 				continue;
 			}
 		}
-		int e1, e2;
 		while (true)
 		{
 			std::cout << "Select field: ";
-			std::cin >> end;
-			e1 = e1 = end[0] - 97, e2 = end[1] - 49;
-			e2 = abs(e2 - 7);
-			if (CheckSelectField(s1, s2, e1, e2)) break;
+			coordinatesEnd = SelectFigureByMouse(window);
+			if (CheckSelectField(coordinatesStart.first, coordinatesStart.second, coordinatesEnd.first, coordinatesEnd.second)) break;
 			else
 			{
 				std::cout << "Uncorrect field! Try again!\n";
 				continue;
 			}
 		}
-		UpdateField(s1, s2, e1, e2);
+		UpdateField(coordinatesStart.first, coordinatesStart.second, coordinatesEnd.first, coordinatesEnd.second);
 		return;
 	}
 }
 
-void Chess::BlackMotion()
+void Chess::BlackMotion(sf::RenderWindow& window)
 {
-	std::string start, end;
+	std::pair<int, int> coordinatesStart, coordinatesEnd;
 	while (true) {
 		std::cout << "<-- Black motion -->\n";
-		int s1, s2;
 		while (true)
 		{
 			std::cout << "Select figure: ";
-			std::cin >> start;
-			s1 = start[0] - 97, s2 = start[1] - 49;
-			s2 = abs(s2 - 7);
-			if (CheckSelectFigure(s1, s2, 2)) break;
+			coordinatesStart = SelectFigureByMouse(window);
+			if (CheckSelectFigure(coordinatesStart.first, coordinatesStart.second, 2)) break;
 			else
 			{
 				std::cout << "Uncorrect chose! Try again!\n";
@@ -468,17 +506,15 @@ void Chess::BlackMotion()
 		while (true)
 		{
 			std::cout << "Select field: ";
-			std::cin >> end;
-			e1 = e1 = end[0] - 97, e2 = end[1] - 49;
-			e2 = abs(e2 - 7);
-			if (CheckSelectField(s1, s2, e1, e2)) break;
+			coordinatesEnd = SelectFigureByMouse(window);
+			if (CheckSelectField(coordinatesStart.first, coordinatesStart.second, coordinatesEnd.first, coordinatesEnd.second)) break;
 			else
 			{
 				std::cout << "Uncorrect field! Try again!\n";
 				continue;
 			}
 		}
-		UpdateField(s1, s2, e1, e2);
+		UpdateField(coordinatesStart.first, coordinatesStart.second, coordinatesEnd.first, coordinatesEnd.second);
 		return;
 	}
 }

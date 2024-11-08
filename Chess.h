@@ -52,7 +52,7 @@ private:
 	bool inPlay = false;
 
 	//A function for getting possible moves for any figure
-	std::set<std::pair<int, int>> GetPossibleMoves(int x, int y);
+	std::pair<std::set<std::pair<int, int>>, std::set<std::pair<int, int>>> GetPossibleMoves(int x, int y);
 
 	//A function for determining of Check
 	bool CheckForCheck(std::vector<std::vector<Figure>> field);
@@ -66,7 +66,10 @@ private:
 	//A function for update the chessboard after motion
 	void UpdateField(int s1, int s2, int e1, int e2);
 
+	//Function for mouse controle
+	std::pair<int, int> SelectFigureByMouse(sf::RenderWindow& window);
+
 	//Functions for making a move
-	void WhiteMotion();
-	void BlackMotion();
+	void WhiteMotion(sf::RenderWindow& window);
+	void BlackMotion(sf::RenderWindow& window);
 };
